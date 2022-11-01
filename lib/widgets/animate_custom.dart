@@ -25,10 +25,6 @@ class _AnimateWidgetState extends State<AnimateWidget>
 
   Ticker? _ticker;
   // final bool _isPressed = false;
-  @override
-  void initState() {
-    super.initState();
-  }
 
   void _startAnimation() {
     _ticker ??= Ticker(_onTick);
@@ -67,25 +63,36 @@ class _AnimateWidgetState extends State<AnimateWidget>
   @override
   Widget build(BuildContext context) {
     const maxHeight = 80.0;
-    const maxWidth = 250.0;
+    const maxWidth = 280.0;
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: maxWidth),
-      child: Material(
-        color: const Color(0xFF282828),
-        borderRadius: BorderRadius.circular(70),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            // print(constraints.maxHeight);
-            return SizedBox(
-              height: maxHeight,
-              child: Stack(
-                children: [
-                  _builtActionsButtons(),
-                  _buildCentralButton(),
-                ],
+      constraints: const BoxConstraints(
+        maxWidth: maxWidth,
+      ),
+      child: SizedBox(
+        height: maxHeight,
+        child: Align(
+          alignment: _dragAligment,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: maxWidth - 60),
+            child: Material(
+              color: const Color(0xFF282828),
+              borderRadius: BorderRadius.circular(70),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // print(constraints.maxHeight);
+                  return SizedBox(
+                    height: maxHeight,
+                    child: Stack(
+                      children: [
+                        _builtActionsButtons(),
+                        _buildCentralButton(),
+                      ],
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -96,14 +103,15 @@ class _AnimateWidgetState extends State<AnimateWidget>
       alignment: _dragAligment,
       child: GestureDetector(
         onPanUpdate: (details) {
+          // print('Se ejecuta al arrastrar');
           setState(() {
             _dragAligment += Alignment(
               details.delta.dx / (200 / 2),
               0,
             );
 
-            print('DragAlitment: $_dragAligment');
-            print('details.delta.dx: ${details.delta.dx}');
+            // print('DragAlitment: $_dragAligment');
+            // print('details.delta.dx: ${details.delta.dx}');
 
             if (_dragAligment.x > 1) {
               _dragAligment = const Alignment(1.0, 0.0);
@@ -113,12 +121,17 @@ class _AnimateWidgetState extends State<AnimateWidget>
           });
         },
         onPanEnd: (_) {
+          // print('Se ejecuta al dejar de tocar');
           if (_dragAligment.x > 0) {
             _contador++;
           } else {
             _contador--;
           }
           _startAnimation();
+        },
+        onPanDown: (details) {
+          // print('Se ejecuta al tocar');
+          _stopAnimation();
         },
         child: SizedBox(
           height: 80,
